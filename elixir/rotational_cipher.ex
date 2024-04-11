@@ -13,7 +13,7 @@ defmodule RotationalCipher do
   def rotate(text, shift) do
     text
     |> String.split("", trim: true)
-    |> Enum.map(fn v -> replace_char(v, shift) end)
+    |> Enum.map(&replace_char(&1, shift))
     |> List.to_string()
   end
 
@@ -28,7 +28,7 @@ defmodule RotationalCipher do
   defp cipher(text, shift, alphabet) do
     value_index =
       alphabet
-      |> Enum.find_index(fn v -> v == text end)
+      |> Enum.find_index(&(&1 == text))
       |> Kernel.+(shift)
       |> verify_char_index()
 
