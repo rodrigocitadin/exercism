@@ -1,6 +1,6 @@
 defmodule RotationalCipher do
-  @alphabet for n <- ?a..?z, do: <<n::utf8>>
-  @upcase_alphabet for n <- ?A..?Z, do: <<n::utf8>>
+  @down_alphabet for n <- ?a..?z, do: <<n::utf8>>
+  @up_alphabet for n <- ?A..?Z, do: <<n::utf8>>
 
   @doc """
   Given a plaintext and amount to shift by, return a rotated string.
@@ -18,21 +18,23 @@ defmodule RotationalCipher do
   end
 
   defp replace_char(text, shift) do
-    String.match?(text, ~r/[[:lower:]]/) -> cipher(text, shift, @alphabet)
-    String.match?(text, ~r/[[:upper:]]/) -> cipher(text, shift, @upcase_alphabet)
-    _ -> text
+    cond do
+      String.match?(text, ~r/[[:lower:]]/) -> cipher(text, shift, @down_alphabet)
+      String.match?(text, ~r/[[:upper:]]/) -> cipher(text, shift, @up_alphabet)
+      true -> text
+    end
   end
 
   defp cipher(text, shift, alphabet) do
-    value_index = shift + Enum.find_index(alphabet, fn v -> v == text end)
-
     value_index =
-      if value_index >= 26 do
-        value_index - 26
-      else
-        value_index
-      end
+      alphabet
+      |> Enum.find_index(fn v -> v == text end)
+      |> Kernel.+(shift)
+      |> verify_char_index()
 
     Enum.at(alphabet, value_index)
   end
+
+  defp verify_char_index(index) when index >= 26, do: index - 26
+  defp verify_char_index(index), do: index
 end
